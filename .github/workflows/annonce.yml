@@ -1,0 +1,28 @@
+name: Annonce Discord SHADOW RP V5
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Texte de l’annonce à publier sur Discord'
+        required: true
+        type: string
+
+jobs:
+  annonce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Envoyer l’annonce sur Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          python - <<'PY'
+          import os, json, urllib.request
+          url = os.environ['DISCORD_WEBHOOK']
+          message = os.environ['MESSAGE']
+          data = json.dumps({'content': message}).encode()
+          req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+          with urllib.request.urlopen(req) as response:
+              print('Annonce envoyée :', response.status)
+          PY
